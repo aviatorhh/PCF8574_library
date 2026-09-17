@@ -55,7 +55,9 @@ BeginResult PCF8574::beginResult(){
 
         // Still set internal state but do not write anything to the device
         lastReadMillis = millis();
+#ifndef PCF8574_NO_INTERRUPT        
         PCF8574::attachInterrupt();
+#endif        
         return BeginResult::NO_PINS_CONFIGURED;
     }
 
@@ -113,7 +115,7 @@ PCF8574::PCF8574(uint8_t address){
 
 	_address = address;
 };
-
+#ifndef PCF8574_NO_INTERRUPT
 /**
  * Construcor
  * @param address: i2c address
@@ -128,7 +130,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	_interruptFunction = interruptFunction;
 	_usingInterrupt = true;
 };
-
+#endif
 #if !defined(__AVR) && !defined(ARDUINO_ARCH_SAMD) && !defined(TEENSYDUINO) && !defined(ARDUINO_ARCH_RENESAS)
 	/**
 	 * Constructor
@@ -229,7 +231,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 	};
 #endif
 	bool encoderPins[8];
-
+#ifndef PCF8574_NO_INTERRUPT
 	void PCF8574::attachInterrupt(){
 		// If using interrupt set interrupt value to pin
 		if (_usingInterrupt){
@@ -256,7 +258,7 @@ PCF8574::PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunctio
 		}
 
 	}
-
+#endif
 bool PCF8574::begin(uint8_t address){
 	_address = address;
 	return PCF8574::begin();
@@ -320,9 +322,9 @@ bool PCF8574::begin(){
 //		::pinMode(_interruptPin, INPUT_PULLUP);
 //		::attachInterrupt(digitalPinToInterrupt(_interruptPin), (*_interruptFunction), FALLING );
 //	}
-
+#ifndef PCF8574_NO_INTERRUPT
 	PCF8574::attachInterrupt();
-
+#endif
 	// inizialize last read
 	lastReadMillis = millis();
 
@@ -459,8 +461,9 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 
 #ifdef BASIC_ENCODER_ALGORITHM
 	bool PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB, volatile long *encoderValue, bool reverseRotation){
+#ifndef PCF8574_NO_INTERRUPT        
 		PCF8574::detachInterrupt();
-
+#endif
 		  bool changed = false;
 
 		  byte na = PCF8574::digitalRead(pinA, true);
@@ -503,8 +506,9 @@ bool PCF8574::checkProgression(byte oldValA, byte oldValB, byte newValA, byte ne
 
 		  this->encoderValues = (encoderPinALast!=na)?this->encoderValues ^ bit(pinA):this->encoderValues;
 		  this->encoderValues = (encoderPinBLast!=nb)?this->encoderValues ^ bit(pinB):this->encoderValues;
+#ifndef PCF8574_NO_INTERRUPT          
 		  PCF8574::attachInterrupt();
-
+#endif
 			return changed;
 	}
 	int8_t PCF8574::readEncoderValue(uint8_t pinA, uint8_t pinB) {

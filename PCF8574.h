@@ -121,8 +121,9 @@ class PCF8574 {
 public:
 
 	PCF8574(uint8_t address);
+#ifndef PCF8574_NO_INTERRUPT    
 	PCF8574(uint8_t address, uint8_t interruptPin,  void (*interruptFunction)() );
-
+#endif
 #if !defined(__AVR) && !defined(ARDUINO_ARCH_SAMD) && !defined(TEENSYDUINO) && !defined(ARDUINO_ARCH_RENESAS)
 	PCF8574(uint8_t address, int sda, int scl);
 	PCF8574(uint8_t address, int sda, int scl, uint8_t interruptPin,  void (*interruptFunction)());
@@ -162,10 +163,10 @@ public:
 	void pinMode(uint8_t pin, uint8_t mode, uint8_t output_start = HIGH);
 
 	void encoder(uint8_t pinA, uint8_t pinB);
-
+#ifndef PCF8574_NO_INTERRUPT
 	void attachInterrupt();
 	void detachInterrupt();
-
+#endif
 	void readBuffer(bool force = true);
 	uint8_t digitalRead(uint8_t pin, bool forceReadNow = false);
 	// Measure length (in microseconds) of a pulse on the pin. Compatible with Arduino pulseIn semantics.
